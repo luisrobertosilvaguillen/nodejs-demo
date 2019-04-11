@@ -1,0 +1,1 @@
+module.exports.SEED = 'lkjlaft##mas@#2';

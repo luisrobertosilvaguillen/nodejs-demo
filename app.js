@@ -13,8 +13,8 @@ var userRoutes = require('./routes/user');
 var loginRoutes = require('./routes/login');
 var appRoutes = require('./routes/app');
 
-mongoose.connection.openUri('mongodb+srv://lsilva:lsilvamongodb@testing-fpcxy.mongodb.net/test?retryWrites=true', (err, res) => {
-    //mongoose.connection.openUri('mongodb://localhost:27017/nodeDemo', (err, res) => {
+//mongoose.connection.openUri('mongodb+srv://lsilva:lsilvamongodb@testing-fpcxy.mongodb.net/test?retryWrites=true', (err, res) => {
+mongoose.connection.openUri('mongodb://localhost:27017/nodeDemo', (err, res) => {
     if (err) throw err;
     console.log('Database Running');
 });

@@ -1,6 +1,7 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
 var jwt = require('jsonwebtoken');
+var seed = require('../config/config').SEED;
 
 var app = express();
 var User = require('../models/user');
@@ -31,7 +32,8 @@ app.post('/', (req, res, next) => {
                 message: 'Invalid Password',
                 errors: err
             });
-        var token = jwt.sign({ user: user }, 'lkjlaft##mas@#2', { expiresIn: 14440 }); // 4 Horas
+
+        var token = jwt.sign({ user: user }, seed, { expiresIn: 14440 }); // 4 Horas
         res.status(200).json({
             ok: true,
             token

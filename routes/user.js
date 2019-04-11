@@ -1,12 +1,13 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
+var middlewareToken = require('../middlewares/auth');
 
 var app = express();
 var User = require('../models/user');
 
 
 // GET USERS //
-app.get('/', (req, res, next) => {
+app.get('/', middlewareToken.verifyToken, (req, res, next) => {
 
     User.find({}, 'name email img, role').exec(
         (err, users) => {
@@ -25,7 +26,7 @@ app.get('/', (req, res, next) => {
 });
 
 // DELETE USERS //
-app.delete('/:id', (req, res) => {
+app.delete('/:id', middlewareToken.verifyToken, (req, res) => {
     var id = req.params.id;
     User.findByIdAndDelete(id, (err, userDeleted) => {
         if (err)
@@ -51,7 +52,7 @@ app.delete('/:id', (req, res) => {
 });
 
 // UPDATE USER //
-app.put('/:id', (req, res) => {
+app.put('/:id', middlewareToken.verifyToken, (req, res) => {
     var id = req.params.id;
     var body = req.body;
 
@@ -98,7 +99,8 @@ app.put('/:id', (req, res) => {
 })
 
 // CREATE USER //
-app.post('/', (req, res, next) => {
+app.post('/', middlewareToken.verifyToken, (req, res, next) => {
+
     var body = req.body;
 
     var user = new User({
@@ -110,7 +112,8 @@ app.post('/', (req, res, next) => {
             return res.status(400).json({
                 ok: false,
                 message: 'Error in DB saving user',
-                errors: err
+                errors: err,
+                user: req.user
             });
 
         res.status(201).json({
@@ -119,5 +122,8 @@ app.post('/', (req, res, next) => {
         })
     })
 });
+
+
+
 
 module.exports = app;
