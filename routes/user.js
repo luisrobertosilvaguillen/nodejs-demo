@@ -7,7 +7,7 @@ var User = require('../models/user');
 
 
 // GET USERS //
-app.get('/', middlewareToken.verifyToken, (req, res, next) => {
+app.get('/', (req, res, next) => {
 
     User.find({}, 'name email img, role').exec(
         (err, users) => {
@@ -99,13 +99,14 @@ app.put('/:id', middlewareToken.verifyToken, (req, res) => {
 })
 
 // CREATE USER //
-app.post('/', middlewareToken.verifyToken, (req, res, next) => {
+app.post('/', (req, res, next) => {
 
     var body = req.body;
 
     var user = new User({
         ...body
     });
+    console.log(user.password)
     user.password = bcrypt.hashSync(user.password, 10);
     user.save((err, userSaved) => {
         if (err)

@@ -9,6 +9,7 @@ var User = require('../models/user');
 // LOGIN //
 app.post('/', (req, res, next) => {
     var body = req.body;
+    console.log(body.email);
 
     User.findOne({ email: body.email }, (err, user) => {
 
@@ -18,7 +19,7 @@ app.post('/', (req, res, next) => {
                 message: 'Error finding user',
                 errors: err
             });
-
+        console.log(user);
         if (!user)
             return res.status(400).json({
                 ok: false,
@@ -33,10 +34,13 @@ app.post('/', (req, res, next) => {
                 errors: err
             });
 
+        console.log(user);
         var token = jwt.sign({ user: user }, seed, { expiresIn: 14440 }); // 4 Horas
         res.status(200).json({
             ok: true,
-            token
+            token,
+            user,
+            id: user._id
         })
 
     });
