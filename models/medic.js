@@ -6,6 +6,8 @@ var medicSchema = new Schema({
     name: { type: String, required: [true, 'El nombre es necesario'] },
     img: { type: String, required: false },
     user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    deleted: { type: Boolean, default: false },
+    isactive: { type: Boolean, default: true },
     hospital: {
         type: Schema.Types.ObjectId,
         ref: 'Hospital',

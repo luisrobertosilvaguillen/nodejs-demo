@@ -8,8 +8,13 @@ var User = require('../models/user');
 
 // GET USERS //
 app.get('/', (req, res, next) => {
+    var from = req.query.from || 0;
+    from = Number(from);
 
-    User.find({}, 'name email img, role').exec(
+    User.find({deleted: false}, 'name email img role')
+    .skip(from)
+    .limit(5)    
+    .exec(
         (err, users) => {
             if (err)
                 return res.status(500).json({
@@ -17,18 +22,22 @@ app.get('/', (req, res, next) => {
                     message: 'Error in DB',
                     errors: err
                 });
+                User.count({deleted: false}, (err, counter) => {
 
-            res.status(200).json({
-                ok: true,
-                users
-            })
+                    res.status(200).json({
+                        ok: true,
+                        users,
+                        total: counter
+                    });
+
+                })
         })
 });
 
 // DELETE USERS //
 app.delete('/:id', middlewareToken.verifyToken, (req, res) => {
     var id = req.params.id;
-    User.findByIdAndDelete(id, (err, userDeleted) => {
+    User.findById(id, (err, user) => {
         if (err)
             return res.status(500).json({
                 ok: false,
@@ -38,17 +47,32 @@ app.delete('/:id', middlewareToken.verifyToken, (req, res) => {
                 }
             });
 
-        if (!userDeleted)
+        if (!user)
             return res.status(400).json({
                 ok: false,
-                message: `User ${id} do not exist`,
+                message: 'User do not exist',
                 errors: err
             });
-        res.status(200).json({
-            ok: true,
-            user: userDeleted
+
+
+        user.deleted = true;
+
+        user.save((err, userUpdated) => {
+            if (err)
+                return res.status(400).json({
+                    ok: false,
+                    message: 'Error updating user',
+                    errors: err
+                });
+
+            res.status(200).json({
+                ok: true,
+                user: userUpdated
+            })
         })
-    })
+
+
+    });
 });
 
 // UPDATE USER //

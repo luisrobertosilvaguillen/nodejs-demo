@@ -9,26 +9,26 @@ var User = require('../models/user');
 // ==============================
 // Busqueda por colección
 // ==============================
-app.get('/coleccion/:tabla/:search', (req, res) => {
+app.get('/collection/:table/:search', (req, res) => {
 
     var search = req.params.search;
-    var tabla = req.params.tabla;
+    var table = req.params.table;
     var regex = new RegExp(search, 'i');
 
-    var promesa;
+    var promise;
 
-    switch (tabla) {
+    switch (table) {
 
         case 'users':
-            promesa = searchUsers(search, regex);
+            promise = searchUsers(search, regex);
             break;
 
         case 'medics':
-            promesa = searchMedics(search, regex);
+            promise = searchMedics(search, regex);
             break;
 
         case 'hospitals':
-            promesa = searchHospitales(search, regex);
+            promise = searchHospitals(search, regex);
             break;
 
         default:
@@ -40,11 +40,11 @@ app.get('/coleccion/:tabla/:search', (req, res) => {
 
     }
 
-    promesa.then(data => {
+    promise.then(data => {
 
         res.status(200).json({
             ok: true,
-            [tabla]: data
+            [table]: data
         });
 
     })
@@ -84,8 +84,8 @@ function searchHospitals(search, regex) {
 
     return new Promise((resolve, reject) => {
 
-        Hospital.find({ name: regex })
-            .populate('user', 'name email')
+        Hospital.find({ name: regex, deleted: false })
+            .populate('user', 'id name email')
             .exec((err, hospitals) => {
 
                 if (err) {
@@ -101,9 +101,9 @@ function searchMedics(search, regex) {
 
     return new Promise((resolve, reject) => {
 
-        Medic.find({ name: regex })
+        Medic.find({ name: regex, deleted: false })
             .populate('user', 'name email')
-            .populate('hospital')
+            .populate('hospital', 'id name')
             .exec((err, medics) => {
 
                 if (err) {
@@ -119,7 +119,7 @@ function searchUsers(search, regex) {
 
     return new Promise((resolve, reject) => {
 
-        User.find({}, 'name email role')
+        User.find({deleted: false}, 'name email role')
             .or([{ 'name': regex }, { 'email': regex }])
             .exec((err, users) => {
 

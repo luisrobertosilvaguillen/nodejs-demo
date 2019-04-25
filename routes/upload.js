@@ -135,9 +135,12 @@ function subirPorTipo(type, id, nameArchivo, res) {
 
     if (type === 'medics') {
 
-        Medic.findById(id, (err, medico) => {
+        Medic.findOne({_id: id, deleted: false}, '_id name img isactive user')
+        .populate('user', '_id name img email')
+        .populate('hospital', '_id name img')
+        .exec((err, medic) => {
 
-            if (!medico) {
+            if (!medic) {
                 return res.status(400).json({
                     ok: true,
                     message: 'Médico no existe',
@@ -145,21 +148,21 @@ function subirPorTipo(type, id, nameArchivo, res) {
                 });
             }
 
-            var pathViejo = './uploads/medics/' + medico.img;
+            var pathViejo = './uploads/medics/' + medic.img;
 
             // Si existe, elimina la imagen anterior
-            if (fs.existsSync(pathViejo)) {
-                fs.unlink(pathViejo);
-            }
+            // if (fs.existsSync(pathViejo)) {
+            //     fs.unlink(pathViejo);
+            // }
 
-            medico.img = nameArchivo;
+            medic.img = nameArchivo;
 
-            medico.save((err, medicoActualizado) => {
+            medic.save((err, medicUpdated) => {
 
                 return res.status(200).json({
                     ok: true,
                     message: 'Imagen de médico actualizada',
-                    user: medicoActualizado
+                    medic: medicUpdated
                 });
 
             })
@@ -193,7 +196,7 @@ function subirPorTipo(type, id, nameArchivo, res) {
                 return res.status(200).json({
                     ok: true,
                     message: 'Imagen de hospital actualizada',
-                    user: hospitalActualizado
+                    hospital: hospitalActualizado
                 });
 
             })
